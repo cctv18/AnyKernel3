@@ -64,7 +64,6 @@ fi
 KSUD_PATH="/data/adb/ksud"
 ui_print "安装 zram压缩算法附加 模块？音量上跳过安装；音量下安装模块"
 ui_print "Install zram module?Volume up: NO；Volume down: YES"
-;;
 
 key_click=""
 while [ "$key_click" = "" ]; do
