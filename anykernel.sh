@@ -4,7 +4,7 @@
 ### AnyKernel setup
 # global properties
 properties() { '
-kernel.string=KernelSU by KernelSU Developers | Build by Suxiaoqingx
+kernel.string=KernelSU by KernelSU Developers | Build by cctv18
 do.devicecheck=0
 do.modules=0
 do.systemless=0
@@ -39,7 +39,8 @@ case $kernel_version in
     *) ksu_supported=false ;;
 esac
 
-ui_print "内核构建者: Coolapk@Suxiaoqing"
+ui_print "内核构建者: Coolapk@Scctv18"
+ui_print "zram模块支持: Coolapk@Suxiaoqing"
 ui_print " " "  -> ksu_supported: $ksu_supported"
 $ksu_supported || abort "  -> Non-GKI device, abort."
 
@@ -63,6 +64,7 @@ fi
 KSUD_PATH="/data/adb/ksud"
 ui_print "安装 zram压缩算法附加 模块？音量上跳过安装；音量下安装模块"
 ui_print "Install zram module?Volume up: NO；Volume down: YES"
+;;
 
 key_click=""
 while [ "$key_click" = "" ]; do
