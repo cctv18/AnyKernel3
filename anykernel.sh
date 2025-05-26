@@ -56,34 +56,14 @@ fi
 # 优先选择模块路径
 if [ -f "$AKHOME/zram.zip" ]; then
     MODULE_PATH="$AKHOME/zram.zip"
+    KSUD_PATH="/data/adb/ksud"
+    if [ -f "$KSUD_PATH" ]; then
+        ui_print "Installing zram Module..."
+        /data/adb/ksud module install "$MODULE_PATH"
+        ui_print "Installation Complete!"
+    else
+        ui_print "KSUD Not Found, skipping installation..."
+    fi
 else
-    ui_print "  -> No ZRAM module found!"
-    exit 1
+    ui_print "ZRAM module Not Found, skipping ZRAM module installation"
 fi
-
-KSUD_PATH="/data/adb/ksud"
-ui_print "安装 zram压缩算法附加 模块？音量上跳过安装；音量下安装模块"
-ui_print "Install zram module?Volume up: NO；Volume down: YES"
-
-key_click=""
-while [ "$key_click" = "" ]; do
-    key_click=$(getevent -qlc 1 | awk '{ print $3 }' | grep 'KEY_VOLUME')
-    sleep 0.2
-done
-case "$key_click" in
-    "KEY_VOLUMEDOWN")
-        if [ -f "$KSUD_PATH" ]; then
-            ui_print "Installing zram Module..."
-            /data/adb/ksud module install "$MODULE_PATH"
-            ui_print "Installation Complete"
-        else
-            ui_print "KSUD Not Found, skipping installation"
-        fi
-        ;;
-    "KEY_VOLUMEUP")
-        ui_print "Skipping zram module installation"
-        ;;
-    *)
-        ui_print "Unknown key input, skipping installation"
-        ;;
-esac
