@@ -40,7 +40,6 @@ case $kernel_version in
 esac
 
 ui_print "内核构建者: Coolapk@Scctv18"
-ui_print "zram模块支持: Coolapk@Suxiaoqing"
 ui_print " " "  -> ksu_supported: $ksu_supported"
 $ksu_supported || abort "  -> Non-GKI device, abort."
 
