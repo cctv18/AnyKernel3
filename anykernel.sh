@@ -33,9 +33,8 @@ no_magisk_check=1
 
 kernel_version=$(cat /proc/version | awk -F '-' '{print $1}' | awk '{print $3}')
 case $kernel_version in
-    5.1*) ksu_supported=true ;;
-    6.1*) ksu_supported=true ;;
-    6.6*) ksu_supported=true ;;
+    5.*) ksu_supported=true ;;
+    6.*) ksu_supported=true ;;
     *) ksu_supported=false ;;
 esac
 
@@ -64,5 +63,18 @@ if [ -f "$AKHOME/zram.zip" ]; then
         ui_print "KSUD Not Found, skipping installation..."
     fi
 else
-    ui_print "ZRAM module Not Found, skipping ZRAM module installation"
+    ui_print "ZRAM module Not Found, skipping ZRAM module installation..."
+fi
+if [ -f "$AKHOME/kpn.zip" ]; then
+    MODULE_PATH="$AKHOME/kpn.zip"
+    KSUD_PATH="/data/adb/ksud"
+    if [ -f "$KSUD_PATH" ]; then
+        ui_print "Installing KP-N Module..."
+        /data/adb/ksud module install "$MODULE_PATH"
+        ui_print "Installation Complete!"
+    else
+        ui_print "KSUD Not Found, skipping installation..."
+    fi
+else
+    ui_print "KP-N module Not Found, skipping KP-N module installation..."
 fi
