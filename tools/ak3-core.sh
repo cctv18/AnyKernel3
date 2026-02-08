@@ -245,7 +245,7 @@ repack_ramdisk() {
 
 # flash_boot (build, sign and write image only)
 flash_boot() {
-  local varlist i kernel ramdisk fdt cmdline comp part0 part1 nocompflag signfail pk8 cert avbtype;
+  local varlist i kernel ramdisk fdt cmdline comp part0 part1 needskernelpatch nocompflag signfail pk8 cert avbtype;
 
   cd $SPLITIMG;
   if [ -f "$BIN/mkimage" ]; then
@@ -329,23 +329,28 @@ flash_boot() {
         if [ "$magisk_patched" -eq 1 ]; then
           ui_print " " "Magisk detected! Patching kernel so reflashing Magisk is not necessary...";
           comp=$(magiskboot decompress kernel 2>&1 | grep -vE 'raw|zimage' | sed -n 's;.*\[\(.*\)\];\1;p');
-          (magiskboot split $kernel || magiskboot decompress $kernel kernel) 2>/dev/null;
+          (magiskboot split $kernel || magiskboot decompress $kernel kernel) >&2;
           if [ $? != 0 -a "$comp" ] && $comp --help 2>/dev/null; then
             echo "Attempting kernel unpack with busybox $comp..." >&2;
             $comp -dc $kernel > kernel;
           fi;
           # legacy SAR kernel string skip_initramfs -> want_initramfs
-          magiskboot hexpatch kernel 736B69705F696E697472616D6673 77616E745F696E697472616D6673;
+          magiskboot hexpatch kernel 736B69705F696E697472616D6673 77616E745F696E697472616D6673 && needskernelpatch=1;
           if [ "$(file_getprop $AKHOME/anykernel.sh do.modules)" == 1 ] && [ "$(file_getprop $AKHOME/anykernel.sh do.systemless)" == 1 ]; then
             strings kernel 2>/dev/null | grep -E -m1 'Linux version.*#' > $AKHOME/vertmp;
           fi;
-          if [ "$comp" ]; then
-            magiskboot compress=$comp kernel kernel.$comp;
-            if [ $? != 0 ] && $comp --help 2>/dev/null; then
-              echo "Attempting kernel repack with busybox $comp..." >&2;
-              $comp -9c kernel > kernel.$comp;
+          if [ "$needskernelpatch" ]; then
+            if [ "$comp" ]; then
+              magiskboot compress=$comp kernel kernel.$comp;
+              if [ $? != 0 ] && $comp --help 2>/dev/null; then
+                echo "Attempting kernel repack with busybox $comp..." >&2;
+                $comp -9c kernel > kernel.$comp;
+              fi;
+              mv -f kernel.$comp kernel;
             fi;
-            mv -f kernel.$comp kernel;
+          else
+            echo "Restoring untouched new kernel since no patching required..." >&2;
+            (magiskboot split -n $kernel || cp -f $kernel kernel) >&2;
           fi;
           [ ! -f .magisk ] && magiskboot cpio ramdisk.cpio "extract .backup/.magisk .magisk";
           export $(cat .magisk);
@@ -355,7 +360,7 @@ flash_boot() {
         elif [ -d /data/data/me.weishu.kernelsu ] && [ "$(file_getprop $AKHOME/anykernel.sh do.modules)" == 1 ] && [ "$(file_getprop $AKHOME/anykernel.sh do.systemless)" == 1 ]; then
           ui_print " " "KernelSU detected! Setting up for kernel helper module...";
           comp=$(magiskboot decompress kernel 2>&1 | grep -vE 'raw|zimage' | sed -n 's;.*\[\(.*\)\];\1;p');
-          (magiskboot split $kernel || magiskboot decompress $kernel kernel) 2>/dev/null;
+          (magiskboot split $kernel || magiskboot decompress $kernel kernel) >&2;
           if [ $? != 0 -a "$comp" ] && $comp --help 2>/dev/null; then
             echo "Attempting kernel unpack with busybox $comp..." >&2;
             $comp -dc $kernel > kernel;
