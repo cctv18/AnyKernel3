@@ -34,12 +34,12 @@ NO_MAGISK_CHECK=1
 ui_print "内核构建者: Coolapk@cctv18"
 
 # boot install
-if [ -L "/dev/block/bootdevice/by-name/init_boot_a" -o -L "/dev/block/by-name/init_boot_a" ]; then
-    split_boot # for devices with init_boot ramdisk
-    flash_boot # for devices with init_boot ramdisk
+split_boot
+if [ -f "split_img/ramdisk.cpio" ]; then
+    unpack_ramdisk
+    write_boot
 else
-    dump_boot # use split_boot to skip ramdisk unpack, e.g. for devices with init_boot ramdisk
-    write_boot # use flash_boot to skip ramdisk repack, e.g. for devices with init_boot ramdisk
+    flash_boot
 fi
 ## end boot install
 # 优先选择模块路径
