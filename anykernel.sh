@@ -33,6 +33,11 @@ NO_MAGISK_CHECK=1
 
 ui_print "内核构建者: Coolapk@cctv18"
 
+# Resolving occasional file system I/O latency issues which may cause binary execution exceptions
+sync
+sleep 0.5
+chmod -R 755 $AKHOME/tools
+
 # boot install
 split_boot
 if [ -f "split_img/ramdisk.cpio" ]; then
