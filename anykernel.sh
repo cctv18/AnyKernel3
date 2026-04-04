@@ -4,7 +4,7 @@
 ### AnyKernel setup
 # global properties
 properties() { '
-kernel.string=KernelSU by KernelSU Developers | Build by cctv18
+kernel.string=AnyKernel3 by KernelSU Developers | Build by cctv18
 do.devicecheck=0
 do.modules=0
 do.systemless=0
